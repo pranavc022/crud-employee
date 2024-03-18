@@ -1,0 +1,91 @@
+<!-- <p>{{appointments.id}}</p>
+<p>{{appointments.title}}</p>
+<p>{{appointments.date}}</p> -->
+<!-- <div class="container">
+    <nav class="navbar navbar-light bg-light">
+        <form class="form-inline">
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+      </nav>
+</div> -->
+
+<script src="https://kit.fontawesome.com/6f7963ec93.js" crossorigin="anonymous"></script>\
+<div class="container">
+    <div class="row" style="margin: 30px;">
+        <div class="col">
+
+        </div>
+        <div class="col-6">
+            <h2 class="text-center">Employee Database</h2>
+        </div>
+        <div class="col">
+            <input class="form-control" type="text" placeholder="search" [(ngModel)] = "searchText">
+        </div>
+      </div>
+    <div class="card mt-3">
+        <div class="row justify-content-center m-4">
+            <div class="col-6">
+                <div class="row">
+                    <div class="col-12"> <!-- Use col-6 to make the width half -->
+                        <input class="form-control mb-2" [(ngModel)]="newName" type="string" placeholder="Enter your Name">
+                        <label for="gender">Gender</label>
+                        <span *ngFor= "let gen of gender">
+                            <input type="radio" id="{{gen.value}}" value="{{gen.value}}" name="gender" [(ngModel)]="newGender">
+                            <label for = "gen.value" [ngModel] = "newGender" >{{gen.value}}</label>
+                        </span>
+
+                        <input type="email" class="form-control mb-2" [(ngModel)]="newEmail" placeholder="Enter your E-Mail ID">
+                        <input type="number" class="form-control mb-2" [(ngModel)]="newContact" placeholder="Enter your Phone No">
+                        <select [(ngModel)]="deptID" [(ngModel)]="newRole">
+                            <option value="null">None</option>
+                            <option *ngFor="let dept of departments" value="{{dept.name}}">{{dept.name}}</option>
+                        </select>
+                        <button (click) = "resetId()">Reset Role</button>
+                        <!-- <p>{{deptID}}</p> -->
+                        <!-- <input type="text" class="form-control mb-2" [(ngModel)]="newRole" placeholder="Enter your Role"> -->
+                        <button type="submit" class="btn btn-primary" style="margin-left: 40%;" (click)="addAppointment()">Add Employee</button> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h2 class = "text-center mt-5">Employee Details</h2>
+    <div class = "card-body">
+        
+        <table datatable [dtOptions] ="dtoptions" class  = "table table-bordered">
+            <thead class= "bg-dark text-white" style="font-size: large;">
+                <tr>
+                    <td><b>ID</b></td>
+                    <td><b>Name</b></td>
+                    <td><b>Gender</b></td>
+                    <td><b>Email</b></td>
+                    <td><b>Phone Number</b></td>
+                    <td><b>Role</b></td>
+                    <td><b>Action</b></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor = "let appointment of appointments | search :searchText ;index as i" >
+                    <td>{{appointment.id}}</td>
+                    <td>{{appointment.name}}</td>
+                    <td>{{appointment.gender}}</td>
+                    <td>{{appointment.email}}</td>
+                    <td>{{appointment.contact}}</td>
+                    <td>{{appointment.role}}</td>
+                    <td style="width: 30%;">
+
+                        <!-- <i class="fa-solid fa-pen-to-square" style="color: #17263f;" (click)="editAppointment(i)"></i>                        -->
+                        <a class="btn btn-primary" style="margin-right: 10px;" (click)="editAppointment(i)">Edit Employee</a>  
+                        <!-- <i class="fas fa-trash"  (click)="deleteAppointment(i)" style="color: #ee1111;"></i> -->
+                        <a class="btn btn-danger" (click)="deleteAppointment(i)">Delete Employee</a>  
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+    
+   
+</div>
+
