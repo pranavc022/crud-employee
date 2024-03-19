@@ -1,15 +1,3 @@
-<!-- <p>{{appointments.id}}</p>
-<p>{{appointments.title}}</p>
-<p>{{appointments.date}}</p> -->
-<!-- <div class="container">
-    <nav class="navbar navbar-light bg-light">
-        <form class="form-inline">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
-      </nav>
-</div> -->
-
 <script src="https://kit.fontawesome.com/6f7963ec93.js" crossorigin="anonymous"></script>\
 <div class="container">
     <div class="row" style="margin: 30px;">
@@ -20,7 +8,41 @@
             <h2 class="text-center">Employee Database</h2>
         </div>
         <div class="col">
-            <input class="form-control" type="text" placeholder="search" [(ngModel)] = "searchText">
+            <!-- <input class="form-control" type="text" placeholder="Search by Name" (keyup)="filterAppointments()" [(ngModel)] = "searchText">
+            <ul *ngIf="filteredAppointments.length > 0 && searchText.length > 0" class="suggestion-list" style="list-style-type: none;">
+                <li *ngFor="let suggestion of filteredAppointments; trackBy: trackByFn" style="margin: 10px;">
+                  <a (click)="selectSuggestion(suggestion)">{{ suggestion.name }}</a>
+                </li>
+              </ul> -->
+              <div class="search-container">
+                <input
+                  class="form-control search-input"
+                  type="text"
+                  placeholder="Search by Name"
+                  (keyup)="filterAppointments()"
+                  [(ngModel)]="searchText"
+                />
+                <ul
+                  class="suggestion-list"
+                  *ngIf="filteredAppointments.length > 0 && searchText.length > 0"
+                  style="list-style-type: none; position: absolute; top: 100%; left: 0; z-index: 1; background-color: white; border: 1px solid #ddd; width: 100%;"
+                >
+                  <li *ngFor="let suggestion of filteredAppointments; trackBy: trackByFn" style="margin: 10px;">
+                    <a (click)="selectSuggestion(suggestion)">{{ suggestion.name }}</a>
+                  </li>
+                </ul>
+              </div>
+              
+              <table>
+                <tbody>
+                  <tr *ngFor="let appointment of appointments | search:searchText; trackBy: trackByFn; index as i">
+                    <td style="width: 30%;">
+                      <!-- <a class="btn btn-primary" style="margin-right: 10px;" (click)="editAppointment(i)">Edit Employee</a>
+                      <a class="btn btn-danger" (click)="deleteAppointment(i)">Delete Employee</a> -->
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
         </div>
       </div>
     <div class="card mt-3">
@@ -28,20 +50,31 @@
             <div class="col-6">
                 <div class="row">
                     <div class="col-12"> <!-- Use col-6 to make the width half -->
-                        <input class="form-control mb-2" [(ngModel)]="newName" type="string" placeholder="Enter your Name">
+                        <label for="newName">Enter your Name</label>
+                        <input class="form-control mb-2" [(ngModel)]= "newName" type="string" placeholder="Name">
                         <label for="gender">Gender</label>
-                        <span *ngFor= "let gen of gender">
-                            <input type="radio" id="{{gen.value}}" value="{{gen.value}}" name="gender" [(ngModel)]="newGender">
+                        <br>
+                        <span *ngFor= "let gen of gender" style="padding-left: 10px;">
+                
+                            <input type="radio" id="{{gen.value}}" value="{{gen.value}}" name="gender" [(ngModel)]= "newGender">
                             <label for = "gen.value" [ngModel] = "newGender" >{{gen.value}}</label>
                         </span>
+                        <br>
+                        <br>
 
-                        <input type="email" class="form-control mb-2" [(ngModel)]="newEmail" placeholder="Enter your E-Mail ID">
-                        <input type="number" class="form-control mb-2" [(ngModel)]="newContact" placeholder="Enter your Phone No">
-                        <select [(ngModel)]="deptID" [(ngModel)]="newRole">
-                            <option value="null">None</option>
+                        <label for="newEmail">Enter your Email</label>
+                        <input type="email" class="form-control mb-2" [(ngModel)]="newEmail" placeholder="E-Mail ID">
+                        <label for="number">Phone Number</label>
+                        <input type="number" class="form-control mb-2" [(ngModel)]="newContact" placeholder="Phone No.">
+                        <label for="newRole">Select Role</label>
+                        <select [(ngModel)]="newRole" [(ngModel)]="newRole">
+                            <option value="">None</option>
                             <option *ngFor="let dept of departments" value="{{dept.name}}">{{dept.name}}</option>
-                        </select>
-                        <button (click) = "resetId()">Reset Role</button>
+                            
+                        </select>                        
+                        <button (click)= "resetId()" type="reset" >Reset Role</button>
+                        <br>
+                        <br>
                         <!-- <p>{{deptID}}</p> -->
                         <!-- <input type="text" class="form-control mb-2" [(ngModel)]="newRole" placeholder="Enter your Role"> -->
                         <button type="submit" class="btn btn-primary" style="margin-left: 40%;" (click)="addAppointment()">Add Employee</button> 
@@ -52,37 +85,39 @@
     </div>
     <h2 class = "text-center mt-5">Employee Details</h2>
     <div class = "card-body">
-        
-        <table datatable [dtOptions] ="dtoptions" class  = "table table-bordered">
-            <thead class= "bg-dark text-white" style="font-size: large;">
-                <tr>
-                    <td><b>ID</b></td>
-                    <td><b>Name</b></td>
-                    <td><b>Gender</b></td>
-                    <td><b>Email</b></td>
-                    <td><b>Phone Number</b></td>
-                    <td><b>Role</b></td>
-                    <td><b>Action</b></td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor = "let appointment of appointments | search :searchText ;index as i" >
-                    <td>{{appointment.id}}</td>
-                    <td>{{appointment.name}}</td>
-                    <td>{{appointment.gender}}</td>
-                    <td>{{appointment.email}}</td>
-                    <td>{{appointment.contact}}</td>
-                    <td>{{appointment.role}}</td>
-                    <td style="width: 30%;">
-
-                        <!-- <i class="fa-solid fa-pen-to-square" style="color: #17263f;" (click)="editAppointment(i)"></i>                        -->
-                        <a class="btn btn-primary" style="margin-right: 10px;" (click)="editAppointment(i)">Edit Employee</a>  
-                        <!-- <i class="fas fa-trash"  (click)="deleteAppointment(i)" style="color: #ee1111;"></i> -->
-                        <a class="btn btn-danger" (click)="deleteAppointment(i)">Delete Employee</a>  
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <table datatable [dtOptions] ="dtoptions" class  = "table table-bordered">
+                <thead class= "bg-dark text-white" style="font-size: large;">
+                    <tr>
+                        <td><b>ID</b></td>
+                        <td><b>Name</b></td>
+                        <td><b>Gender</b></td>
+                        <td><b>Email</b></td>
+                        <td><b>Phone Number</b></td>
+                        <td><b>Role</b></td>
+                        <td><b>Action</b></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor = "let appointment of appointments | search :searchText ;index as i" >
+                        <td>{{appointment.id}}</td>
+                        <td>{{appointment.name}}</td>
+                        <td>{{appointment.gender}}</td>
+                        <td>{{appointment.email}}</td>
+                        <td>{{appointment.contact}}</td>
+                        <td>{{appointment.role}}</td>
+                        <td style="width: 30%;">
+    
+                            <a class="btn btn-primary" style="margin-right: 10px;" (click)="editAppointment(i)">Edit Employee</a>  
+                            <a class="btn btn-danger" (click)="deleteAppointment(i)">Delete Employee</a>  
+                        </td>
+                    </tr>
+                </tbody>
+             </table> 
+             <mat-paginator [length]="appointments.length"
+               [pageSize]="pageSize"
+               [pageSizeOptions]="pageSizeOptions"
+               [pageIndex]= "pageIndex">
+            </mat-paginator>
 
     </div>
     
