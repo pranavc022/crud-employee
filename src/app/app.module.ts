@@ -10,6 +10,17 @@ import { FormBuilder, FormGroup, Validator, Validators } from '@angular/forms';
 import { SearchPipe } from './search.pipe';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DeptInterfaceTs } from './appointment-list/dept.interface.ts';
+import { HttpClientModule } from '@angular/common/http';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { FirebaseApp } from 'firebase/app';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { environment } from '../environments/environment';
+import { AngularFireModule } from '@angular/fire/compat';
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -21,8 +32,13 @@ import { DeptInterfaceTs } from './appointment-list/dept.interface.ts';
     AppRoutingModule,
     FormsModule,
     DataTablesModule,
-    FontAwesomeModule
-    
+    FontAwesomeModule,
+    HttpClientModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatPaginator,
+    AngularFireModule.initializeApp(environment.firebaseConfig),
+    AngularFirestoreModule,    
   ],
   providers: [],
   bootstrap: [AppComponent]

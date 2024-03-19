@@ -1,0 +1,32 @@
+.search-container {
+    position: relative;
+  }
+  
+  .search-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .suggestion-list {
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none; /* Initially hide the list */
+  }
+  
+  .suggestion-list li {
+    cursor: pointer;
+  }
+  
+  .suggestion-list li:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Show the list when there are results and the search text is present */
+  .search-input:focus + .suggestion-list,
+  .search-input:not([ngModel]) + .suggestion-list {
+    display: block;
+  }
+  

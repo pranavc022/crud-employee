@@ -1,4 +1,4 @@
 export interface DeptInterfaceTs {
-    id:number;
+    id:string;
     name: string;
 }
