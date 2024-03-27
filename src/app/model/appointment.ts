@@ -4,5 +4,6 @@ export interface Appointment {
     email: string,
     contact: number,
     role: string,
-    gender: string
+    gender: string,
+    activeEmployee: boolean
 }

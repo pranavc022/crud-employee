@@ -15,10 +15,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { FirebaseApp } from 'firebase/app';
-import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
-import { environment } from '../environments/environment';
-import { AngularFireModule } from '@angular/fire/compat';
+import { ViewChild } from '@angular/core'
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -37,8 +35,9 @@ import { AngularFireModule } from '@angular/fire/compat';
     MatTableModule,
     MatPaginatorModule,
     MatPaginator,
-    AngularFireModule.initializeApp(environment.firebaseConfig),
-    AngularFirestoreModule,    
+    ReactiveFormsModule,
+
+    
   ],
   providers: [],
   bootstrap: [AppComponent]
