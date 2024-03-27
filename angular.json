@@ -37,8 +37,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss",
-              "C:/Users/Relanto/employee_ui/node_modules/font-awesome/css/font-awesome.css"        
+              "src/styles.scss"            
             ],
             "scripts": []
           },

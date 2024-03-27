@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, booleanAttribute } from '@angular/core';
 import { Appointment } from '../model/appointment';
 import { AppComponent } from '../app.component';
 import { OnInit } from '@angular/core';
@@ -16,28 +16,36 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { ViewChild } from '@angular/core'
 
-
 // import {pen-to-square} from '@fortawesome/free-solid-svg-icons';
 // import {faTrash} from '@fortawesome/free-solid-svg-icons'
+
 
 @Component({
   selector: 'app-appointment-list',
   templateUrl: './appointment-list.component.html',
-  styleUrls: ['./appointment-list.component.scss']
+  styleUrls : ['appointment-list.component.scss']
+
 })
 export class AppointmentListComponent implements OnInit {
-  currentPageIndex = 0;
-  pageSize = 5;
-  pageSizeOptions= [5, 10, 20, 50];
-  pageIndex = 0;
+
+  isEditMode = false;
+  
+  totalEmployees: number = 0;
+  activeEmployees: number = 0;
+  maleEmployees: number = 0;
+  femaleEmployees: number = 0;
+  otherEmployees: number = 0;
 
   empData: Appointment[] = [];
   employeeForm: FormGroup  = new FormGroup({});
 
-  public departments: DeptInterfaceTs[] = [{id:'1', name:'Manager'}, 
+  public departments:Array<DeptInterfaceTs> = [{id:'1', name:'Manager'}, 
   {id:'2',name:'Technical Trainee'}, {id:'3', name: 'Project Lead'}, {id:'4', name:'Hr Executive'},
   {id:'5', name:'Software Developer'}];
   public deptID : string = "";
+
+  currentAppointmentIndex: number | null = null;
+  editingIndex: number | null = null;
   
   constructor(private fb: FormBuilder,
   private router: Router,
@@ -46,9 +54,8 @@ export class AppointmentListComponent implements OnInit {
   private employeeService: EmployeeService){}
   
   public resetId(){
-      this.deptID = ''; 
+      this.deptID = '0'; 
     }
-  // defaultGender: string= 'Male';
  
   gender = [
     {id: 1, value: 'Male'},
@@ -61,6 +68,7 @@ export class AppointmentListComponent implements OnInit {
   newName: string = "";
   newContact:  number = NaN;
   newGender : string = '';
+  newactiveEmployee: boolean = false;
   displayedColumns: string[] = ['id', 'name', 'gender', 'email', 'contact', 'role', 'action'];
   searchText ='';
   dtoptions: DataTables.Settings={};
@@ -68,13 +76,15 @@ export class AppointmentListComponent implements OnInit {
   filteredAppointments: Appointment[] = [];
   dataSource = new MatTableDataSource<any>(this.appointments);
 
-  
-
-
+  pageSize = 3;
+  pageSizeOptions = [3, 10, 20, 50];
   ngOnInit(): void {
+ 
+    
     this.dtoptions={
       pagingType:'full_numbers'
     };
+
     let savedApp = localStorage.getItem("appointments")         // to initialse a new dataitem and fetch from local
     this.appointments = savedApp ? JSON.parse("savedApp") : []    //to check  if there are already some data in local storage,
     this.employeeForm = this.fb.group({
@@ -83,6 +93,9 @@ export class AppointmentListComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       role: ['', Validators.required]
     })
+   
+    this.loadAppointments();
+    this.updateEmployeeCounts();
   }
   onSubmit(){
     if (this.employeeForm.valid) {
@@ -94,71 +107,126 @@ export class AppointmentListComponent implements OnInit {
     }
   }
   onPaginateChange(event: PageEvent) {
-    this.currentPageIndex = event.pageIndex;
+    // Implement logic to update data based on page and page size changes
     this.pageSize = event.pageSize;
-    this.loadData();
   }
 
-  addAppointment() {     //new function to activate on clicking the button
-    if(this.newName.trim().length && this.newEmail.length){
-      let newAppoint: Appointment = {
-        id : Date.now(),
-        name: this.newName,
-        contact: this.newContact,
-        email : this.newEmail,
-        role : this.newRole,
-        gender: this.newGender
-      }
-      this.appointments.push(newAppoint);   //adds the user
-      //reset string values
-      this.newName = '';
-      this.newEmail ='';
-      this.newContact = NaN;
-      this.newGender = '';
-        localStorage.setItem("appointments", JSON.stringify(this.appointments))
-    }
+
+  loadAppointments() {
+    let savedApp = localStorage.getItem('appointments');
+    this.appointments = savedApp ? JSON.parse(savedApp) : [];
+    this.dataSource = new MatTableDataSource<Appointment>(this.appointments);
+    this.updateEmployeeCounts(); // Update counts whenever appointments are loaded
   }
 
-  deleteAppointment(index: number) {
-    const isConfirmed = confirm("Are you sure you want to delete the appointment?");
-
-      // If user confirms, proceed with deletion
-      if (isConfirmed) {
-          this.appointments.splice(index, 1);
-          localStorage.setItem("appointments", JSON.stringify(this.appointments));
-    }
+   updateEmployeeCounts() {
+    this.totalEmployees = this.appointments.length;
+    this.activeEmployees = this.appointments.filter(app => app.activeEmployee).length;
+    this.maleEmployees = this.appointments.filter(app => app.gender === 'Male').length;
+    this.femaleEmployees = this.appointments.filter(app => app.gender === 'Female').length;
+    this.otherEmployees = this.appointments.filter(app => app.gender === 'Others').length;
   }
-  loadData() {
-    // Retrieve data from local storage
-    const storedData = localStorage.getItem('appointments');
-  
-    if (storedData) {
-      // Parse the stored JSON data
-      const jsonData = JSON.parse(storedData);
-  
-      // Calculate the starting index based on the current page and page size
-      const startIndex = this.currentPageIndex * this.pageSize;
-  
-      // Slice the data array to get the current page of data
-      const pageData = jsonData.slice(startIndex, startIndex + this.pageSize);
-  
-      // Do something with the data (e.g., assign it to a component property)
-      this.appointments = pageData;
+
+  addOrUpdateAppointment() {
+    // Ensure email ends with the correct domain
+    if (this.newEmail.endsWith("@relanto.ai")) {
+        if (this.newName.trim().length && this.newEmail.length) {
+            const isUpdateOperation = this.currentAppointmentIndex !== null;
+    
+            if (isUpdateOperation) {
+                // Now use the currentAppointmentIndex for updates.
+                const index = this.currentAppointmentIndex;
+                if (index !== null && index >= 0 && index < this.appointments.length) {
+                    this.appointments[index] = {
+                        id: this.appointments[index].id, // Preserve the existing id
+                        name: this.newName,
+                        contact: this.newContact,
+                        email: this.newEmail,
+                        activeEmployee: this.newactiveEmployee,
+                        role: this.newRole,
+                        gender: this.newGender
+                        
+                    };
+                    alert("Employee Updated Successfully!")
+                } else {
+                    console.log("Error: Appointment to update not found.");
+                    return;
+                }
+                this.isEditMode=false
+            } else {
+                // Adding a new appointment
+                let newAppoint = {
+                    id: Date.now(),
+                    name: this.newName,
+                    contact: this.newContact,
+                    email: this.newEmail,
+                    role: this.newRole,
+                    gender: this.newGender,
+                    activeEmployee: this.newactiveEmployee
+                };
+                this.appointments.push(newAppoint);
+                alert("Employee Added Successfully!")
+            }
+    
+            // Resetting form fields manually
+            this.newName = '';
+            this.newEmail = '';
+            this.newContact = NaN; // Reset to 0 or another appropriate numeric value.
+            this.newRole = '';
+            this.newGender = '';
+            this.newactiveEmployee = false;
+    
+            // Update local storage
+            localStorage.setItem("appointments", JSON.stringify(this.appointments));
+    
+            // Reset the index to null to exit edit mode
+            this.currentAppointmentIndex = null;
+            this.updateEmployeeCounts()
+        }
     } else {
-      console.log('No data found in local storage.');
+        alert("Email must end with @relanto.ai");
     }
   }
 
-  editAppointment(id: number){
-  
   
 
+  deleteAppointment(index : number){
+    this.appointments.splice(index, 1)
+    localStorage.setItem("appointments", JSON.stringify(this.appointments))
+    this.updateEmployeeCounts();
+    alert("Employee Deleted Successfully!");
+
   }
+
+
+  clickMethod(index: number) {
+    if(confirm("Are you sure you want to delete the record")) {
+      console.log(this.deleteAppointment(index));
+    }
+  }
+
+  // editAppointment(id: number){
+  //   // this.router
+  //   this.router.navigate(['/edit', id]);
+
+  // }
+  editAppointment(index: number) {
+    this.isEditMode = true;
+    this.currentAppointmentIndex = index;
+    const appointmentToEdit = this.appointments[index];
+    this.newName = appointmentToEdit.name;
+    this.newGender = appointmentToEdit.gender;
+    this.newEmail = appointmentToEdit.email;
+    this.newContact = appointmentToEdit.contact;
+    this.newRole = appointmentToEdit.role;
+  }
+
   filterAppointments() {
     this.filteredAppointments = this.appointments.filter(
-      (appointment) => appointment.name.toLowerCase().includes(this.searchText.toLowerCase())
+      (appointment) => appointment.name.toLowerCase().startsWith(this.searchText.toLowerCase())
     );
   }
+  
 
   selectSuggestion(suggestion: Appointment) {
     this.searchText = suggestion.name;
@@ -169,6 +237,11 @@ export class AppointmentListComponent implements OnInit {
     return item.id; // Ensure unique tracking for both table and suggestions
   }
 
+  // {  //creating var of type class
+  //   id : 1,
+  //   title: "New Appointment",
+  //   date: new Date('03/04/2024')
+  // }
 
 
 }

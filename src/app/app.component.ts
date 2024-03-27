@@ -4,7 +4,7 @@ import { AppointmentListComponent } from './appointment-list/appointment-list.co
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  //styleUrls: ['./appointment-list/appointment-list.component.scss']
 })
 
 export class AppComponent {

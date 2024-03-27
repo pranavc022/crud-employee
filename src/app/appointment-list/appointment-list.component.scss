@@ -1,13 +1,13 @@
 .search-container {
     position: relative;
   }
-  
+ 
   .search-input {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
   }
-  
+ 
   .suggestion-list {
     padding: 0;
     margin: 0;
@@ -15,18 +15,91 @@
     overflow-y: auto;
     display: none; /* Initially hide the list */
   }
-  
+ 
   .suggestion-list li {
     cursor: pointer;
   }
-  
+ 
   .suggestion-list li:hover {
     background-color: #f1f1f1;
   }
-  
+ 
   /* Show the list when there are results and the search text is present */
   .search-input:focus + .suggestion-list,
   .search-input:not([ngModel]) + .suggestion-list {
     display: block;
   }
+
+  //widgets
   
+  .widget-container {
+    display: flex;
+    align-items: space-between;
+    .widget { 
+      width: 70px;
+      height: 120px;
+      background-color: #fff;
+      color: #fff;
+      border-radius: 5px;
+      margin: 10px;
+      box-shadow: 5px 5px 5px #939393;
+      display: flex;
+      align-items: center;
+      padding: 1px;
+  &.green {
+        background-color: rgb(4, 67, 66);
+      }
+  &.yellow {
+        background-color: rgb(237, 158, 32);
+      }
+  &.red {
+        background-color: rgb(126, 5, 5);
+      }
+  &.blue {
+        background-color: rgb(105, 32, 251);
+      }
+  &.violet {
+        background-color: violet;
+      }
+      @media only screen and (max-width: 1600px) {
+        width: 300px;
+      }
+      @media only screen and (max-width: 1500px) {
+        width: 275px;
+      }
+      @media only screen and (max-width: 1400px) {
+        width: 250px;
+      }
+      @media only screen and (max-width: 1200px) {
+        width: 225px;
+      }
+   
+      .icon {
+        width: 60px;
+        font-size: 25px;
+        text-align: center;
+        
+        @media only screen and (max-width: 1200px) {
+          font-size: 30px;
+
+        }
+      }
+      .value {
+        text-align: center;
+        width: 100px;
+        .top {
+          font-size: 30px;
+          @media only screen and (max-width: 1200px) {
+            font-size: 26px;
+          }
+        }
+        .bottom {
+          font-size: 20px;
+          margin-top: 10px;
+          @media only screen and (max-width: 1200px) {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+  }
